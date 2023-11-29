@@ -33,28 +33,26 @@ dataReorganized <- dataReorganized %>%
 
 head(dataReorganized, 20)
 
-
-
 # Add a column  "Total Crimes"
 dataReorganized <- dataReorganized %>%
   mutate(Total_Crimes = rowSums(select(., -State, -Year, -Month), na.rm = TRUE))
 
+head(dataReorganized, 20)
 
-
-#criar um array com os nomes de crime.
-exmep [a,b,c]
+# Find the mean of all crimes based in the states and month of a specific crime 
+means_crimes <- dataReorganized %>%
+  group_by(State, Month) %>%
+  summarise(across(c(Rape, Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, Robbery_Institution, Cargo_Theft, Vehicle_Robbery, Robbery_Followed_by_Death, Attempted_Homicide), ~mean(., na.rm = TRUE), .names = "Mean_{.col}"))
         
-colocar um loop para cada item em exempla array
+# Replace NA values in the crime columns with the corresponding mean values, keeping only the columns with the results.
+dataReorganized <- dataReorganized %>%
+  left_join(means_crimes, by = c("State", "Month")) %>%
+  mutate(across(c(Rape, Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, Robbery_Institution, Cargo_Theft, Vehicle_Robbery, Robbery_Followed_by_Death, Attempted_Homicide), ~ifelse(is.na(.x), get(paste0("Mean_", cur_column())), .x)),
+         across(c(Rape, Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, Robbery_Institution, Cargo_Theft, Vehicle_Robbery, Robbery_Followed_by_Death, Attempted_Homicide), ~as.integer(round(.)))) %>%
+  select(State, Year, Month, Rape, Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, Robbery_Institution, Cargo_Theft, Vehicle_Robbery, Robbery_Followed_by_Death, Attempted_Homicide)
 
-        # Find a mean based in the States and Month of a specific Crime 
-        means <- dataReorganized %>%
-          group_by(State, Month) %>%
-          summarise(Mean = round(mean(Rape, na.rm = TRUE)))
-        
-        # Substituir valores NA na coluna Rape pelo valor médio correspondente
-        dataReorganized <- dataReorganized %>%
-          left_join(means, by = c("State", "Month")) %>%
-          mutate(Rape = ifelse(is.na(Rape), Mean, Rape))
+# View updated data
+View(dataReorganized)
 
 
 
