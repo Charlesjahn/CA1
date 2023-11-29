@@ -14,10 +14,14 @@ dataReorganized <- dataCrimes %>%
 
 head(dataReorganized, 20)
 
-# Reorganize os dados para de crime em linhas e remova a coluna de ano
+# Find a mean based in the UF (States) and Mes (Month)
 dataLong <- dataReorganized %>%
   select(-Ano) %>%
   group_by(UF, Mês) %>%
   summarise(Mean = round(mean(Estupro, na.rm = TRUE)))
 
 head(dataLong)
+
+# add a new column to sum all crimes for each line
+dataReorganized <- dataReorganized %>%
+  mutate(`Total Crimes` = rowSums(select(., -UF, -Ano, -Mês), na.rm = TRUE))
