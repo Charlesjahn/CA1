@@ -21,3 +21,5 @@ dataLong <- dataReorganized %>%
   summarise(Mean = round(mean(Estupro, na.rm = TRUE)))
 
 head(dataLong)
+
+
