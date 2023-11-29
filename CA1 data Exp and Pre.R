@@ -7,6 +7,8 @@ dataCrimes <- read.csv("C:/Users/charl/Desktop/classes/Data Exploration and Prep
 
 # Show 20 first
 head(dataCrimes, 20)
+dim(dataCrimes)
+summary(dataCrimes)
 
 # Reorganize the data
 dataReorganized <- dataCrimes %>%
