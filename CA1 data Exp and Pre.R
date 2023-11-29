@@ -32,14 +32,31 @@ dataReorganized <- dataReorganized %>%
   )
 
 head(dataReorganized, 20)
-# Find a mean based in the States and Month
-dataLong <- dataReorganized %>%
-  select(-Year) %>%
-  group_by(State, Month) %>%
-  summarise(Mean = round(mean(Rape, na.rm = TRUE)))
 
-head(dataLong)
 
-# add a new column to sum all crimes for each line
+
+# Add a column  "Total Crimes"
 dataReorganized <- dataReorganized %>%
   mutate(Total_Crimes = rowSums(select(., -State, -Year, -Month), na.rm = TRUE))
+
+
+
+#criar um array com os nomes de crime.
+exmep [a,b,c]
+        
+colocar um loop para cada item em exempla array
+
+        # Find a mean based in the States and Month of a specific Crime 
+        means <- dataReorganized %>%
+          group_by(State, Month) %>%
+          summarise(Mean = round(mean(Rape, na.rm = TRUE)))
+        
+        # Substituir valores NA na coluna Rape pelo valor médio correspondente
+        dataReorganized <- dataReorganized %>%
+          left_join(means, by = c("State", "Month")) %>%
+          mutate(Rape = ifelse(is.na(Rape), Mean, Rape))
+
+
+
+
+
