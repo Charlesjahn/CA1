@@ -2,6 +2,10 @@ getwd()
 setwd("C:/Users/charl/Desktop/classes/Data Exploration and Preparation/CA1")
 library(tidyr)
 library(dplyr)
+
+library(ggplot2)
+library(gridExtra)
+
 # read the file
 dataCrimes <- read.csv("C:/Users/charl/Desktop/classes/Data Exploration and Preparation/CA1/Crimes_in_Brazil_2015_2022.csv")
 
@@ -83,12 +87,34 @@ dataReorganized <- dataReorganized %>%
 
 head(dataReorganized[, c('State', 'Year', 'Month', 'Total_Crimes')], 20)
 
-# View updated data
-View(dataReorganized)
 
 
-library(ggplot2)
-library(gridExtra)
+# Remove the column 'Year'
+dataReorganized_no_year <- dataReorganized[, !names(dataReorganized) %in% "Year"]
+
+# Select only numeric columns
+numeric_cols <- sapply(dataReorganized_no_year, is.numeric)
+numeric_data <- dataReorganized_no_year[, numeric_cols]
+
+# Calculate MEAN MEDIAN MIN MAX SD of all columns that is calculable, Limit to 3 decimal
+statistics <- sapply(numeric_data, function(x) {
+  c(Mean = round(mean(x, na.rm = TRUE), digits = 3),
+    Median = round(median(x, na.rm = TRUE), digits = 3),
+    Minimum = round(min(x, na.rm = TRUE), digits = 3),
+    Maximum = round(max(x, na.rm = TRUE), digits = 3),
+    SD = round(sd(x, na.rm = TRUE), digits = 3))
+})
+
+# Transpose the results for display
+statistics <- t(statistics)
+
+# Name lines and columns
+rownames(statistics) <- names(dataReorganized_no_year)[numeric_cols]
+colnames(statistics) <- c("Mean", "Median", "Minimum", "Maximum", "SD")
+
+# show new table with all statistics. 
+statistics
+
 
 # --- PLOT EXAMPLES WITH ORIGINAL DATA ---
 # Plot (Homicide x Bodily_injury_followed_by_death)
