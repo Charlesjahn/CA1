@@ -1,9 +1,9 @@
 getwd()
-setwd("C:/Users/thsan/Desktop/College/7_semester/Data_Exploration_and_Preparation/CA1/CA1")
+setwd("C:/Users/charl/Desktop/classes/Data Exploration and Preparation/CA1")
 library(tidyr)
 library(dplyr)
 # read the file
-dataCrimes <- read.csv("C:/Users/thsan/Desktop/College/7_semester/Data_Exploration_and_Preparation/CA1/CA1/Crimes_in_Brazil_2015_2022.csv")
+dataCrimes <- read.csv("C:/Users/charl/Desktop/classes/Data Exploration and Preparation/CA1/Crimes_in_Brazil_2015_2022.csv")
 
 # Show 20 first
 head(dataCrimes, 20)
