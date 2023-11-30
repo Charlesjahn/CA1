@@ -16,7 +16,7 @@ dataReorganized <- dataCrimes %>%
 
 head(dataReorganized, 20)
 
-#Translate the database titles from Portugues to English
+#Translate the database titles from Portuguese to English
 dataReorganized <- dataReorganized %>%
   rename(
     State = UF,
@@ -33,11 +33,23 @@ dataReorganized <- dataReorganized %>%
     Attempted_Homicide = `Tentativa de homicídio`
   )
 
-head(dataReorganized, 20)
+# months translations 
+translation_dict <- c("janeiro" = "january",
+                      "fevereiro" = "february",
+                      "março" = "march",
+                      "abril" = "april",
+                      "maio" = "may",
+                      "junho" = "june",
+                      "julho" = "july",
+                      "agosto" = "august",
+                      "setembro" = "september",
+                      "outubro" = "october",
+                      "novembro" = "november",
+                      "dezembro" = "december")
 
-# Add a column  "Total Crimes"
-dataReorganized <- dataReorganized %>%
-  mutate(Total_Crimes = rowSums(select(., -State, -Year, -Month), na.rm = TRUE))
+# replace the months from Portuguese to English
+dataReorganized$Month <- translation_dict[dataReorganized$Month]
+
 
 head(dataReorganized, 20)
 
@@ -45,12 +57,8 @@ head(dataReorganized, 20)
 means_crimes <- dataReorganized %>%
   group_by(State, Month) %>%
   summarise(across(c(Rape, 
-                     Vehicle_Theft, 
-                     Homicide, 
-                     Bodily_injury_followed_by_death, 
-                     Robbery_Institution, 
-                     Cargo_Theft, 
-                     Vehicle_Robbery, 
+                     Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, 
+                     Robbery_Institution, Cargo_Theft,Vehicle_Robbery, 
                      Robbery_Followed_by_Death, 
                      Attempted_Homicide), ~mean(., na.rm = TRUE), .names = "Mean_{.col}"))
         
@@ -58,29 +66,21 @@ means_crimes <- dataReorganized %>%
 dataReorganized <- dataReorganized %>%
   left_join(means_crimes, by = c("State", "Month")) %>%
   mutate(across(c(Rape, 
-                  Vehicle_Theft, 
-                  Homicide, 
-                  Bodily_injury_followed_by_death, 
-                  Robbery_Institution, 
-                  Cargo_Theft, 
-                  Vehicle_Robbery, 
+                  Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, 
+                  Robbery_Institution, Cargo_Theft,Vehicle_Robbery, 
                   Robbery_Followed_by_Death, 
                   Attempted_Homicide), ~ifelse(is.na(.x), get(paste0("Mean_", cur_column())), .x)),
          across(c(Rape, 
-                  Vehicle_Theft, 
-                  Homicide, 
-                  Bodily_injury_followed_by_death, 
-                  Robbery_Institution, 
-                  Cargo_Theft, 
-                  Vehicle_Robbery, 
+                  Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, 
+                  Robbery_Institution, Cargo_Theft, Vehicle_Robbery, 
                   Robbery_Followed_by_Death, 
                   Attempted_Homicide), ~as.integer(round(.)))) %>%
   select(State, Year, Month, Rape, Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, Robbery_Institution, Cargo_Theft, Vehicle_Robbery, Robbery_Followed_by_Death, Attempted_Homicide)
 
-# View updated data
-View(dataReorganized)
 
+# Add a column  "Total Crimes"
+dataReorganized <- dataReorganized %>%
+  mutate(Total_Crimes = rowSums(select(., -State, -Year, -Month), na.rm = TRUE))
 
-
-
+head(dataReorganized[, c('State', 'Year', 'Month', 'Total_Crimes')], 20)
 
