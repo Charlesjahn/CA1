@@ -1,9 +1,9 @@
 getwd()
-setwd("C:/Users/charl/Desktop/classes/Data Exploration and Preparation/CA1")
+setwd("C:/Users/thsan/Desktop/College/7_semester/Data_Exploration_and_Preparation/CA1/CA1")
 library(tidyr)
 library(dplyr)
 # read the file
-dataCrimes <- read.csv("C:/Users/charl/Desktop/classes/Data Exploration and Preparation/CA1/Crimes_in_Brazil_2015_2022.csv")
+dataCrimes <- read.csv("C:/Users/thsan/Desktop/College/7_semester/Data_Exploration_and_Preparation/CA1/CA1/Crimes_in_Brazil_2015_2022.csv")
 
 # Show 20 first
 head(dataCrimes, 20)
@@ -55,6 +55,68 @@ dataReorganized <- dataReorganized %>%
 View(dataReorganized)
 
 
+library(ggplot2)
+library(gridExtra)
+
+# --- PLOT EXAMPLES WITH ORIGINAL DATA ---
+# Plot (Homicide x Bodily_injury_followed_by_death)
+ggplot(dataReorganized, aes(x = Homicide, y = Bodily_injury_followed_by_death)) + geom_point()
+
+# Plot (between Vehicle_Theft x Vehicle_Robbery)
+ggplot(dataReorganized, aes(x = Vehicle_Theft, y = Vehicle_Robbery)) + geom_point()
+
+# Plot (between Homicide x Attempted_Homicide)
+ggplot(dataReorganized, aes(x = Homicide, y = Attempted_Homicide)) + geom_point()
+
+# Plot (between Robbery_Institution x Cargo_Theft)
+ggplot(dataReorganized, aes(x = Robbery_Institution, y = Cargo_Theft)) + geom_point()
+
+
+# MinMax Normalization
+normalized_MinMax <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+# MinMax normalization of Homicide and Bodily_injury_followed_by_death
+Homicide_norm<-normalized_MinMax(dataReorganized$Homicide)
+Bodily_injury_followed_by_death_norm<-normalized_MinMax(dataReorganized$Bodily_injury_followed_by_death)
+# Normalized plot (Homicide x Bodily_injury_followed_by_death)
+ggplot(dataReorganized, aes(x = Homicide_norm, y = Bodily_injury_followed_by_death_norm)) + geom_point()
+
+# MinMax normalization of Vehicle_Theft and Vehicle_Robbery
+Vehicle_Theft_norm<-normalized_MinMax(dataReorganized$Vehicle_Theft)
+Vehicle_Robbery_norm<-normalized_MinMax(dataReorganized$Vehicle_Robbery)
+# Normalized plot (Vehicle_Theft x Vehicle_Robbery)
+ggplot(dataReorganized, aes(x = Vehicle_Theft_norm, y = Vehicle_Robbery_norm)) + geom_point()
+
+# MinMax normalization of Homicide and Attempted_Homicide
+Homicide_norm<-normalized_MinMax(dataReorganized$Homicide)
+Attempted_Homicide_norm<-normalized_MinMax(dataReorganized$Attempted_Homicide)
+# Normalized plot (Homicide x Attempted_Homicide)
+ggplot(dataReorganized, aes(x = Homicide_norm, y = Attempted_Homicide_norm)) + geom_point()
+
+# MinMax normalization of Robbery_Institution and Cargo_Theft
+Robbery_Institution_norm<-normalized_MinMax(dataReorganized$Robbery_Institution)
+Cargo_Theft_norm<-normalized_MinMax(dataReorganized$Cargo_Theft)
+# Normalized plot (Homicide x Attempted_Homicide)
+ggplot(dataReorganized, aes(x = Robbery_Institution_norm, y = Cargo_Theft_norm)) + geom_point()
 
 
 
+# Z-score Standardization  
+Homicide_zscaled<-scale(dataReorganized$Homicide)
+Bodily_injury_followed_by_death_zscaled<-scale(dataReorganized$Bodily_injury_followed_by_death)
+# Z-score plot (Homicide x Bodily_injury_followed_by_death)
+ggplot(dataReorganized, aes(x = Homicide_zscaled, y = Bodily_injury_followed_by_death_zscaled)) + geom_point()
+
+
+
+# Robust Scaler
+install.packages("robustbase")
+library(robustbase)
+
+# Normalization with Robust Scaler
+Homicide_robust <- (dataReorganized$Homicide - median(dataReorganized$Homicide)) / mad(dataReorganized$Homicide)
+Bodily_injury_followed_by_death_robust <- (dataReorganized$Bodily_injury_followed_by_death - median(dataReorganized$Bodily_injury_followed_by_death)) / mad(dataReorganized$Bodily_injury_followed_by_death)
+# Robust Scaler plot (Homicide x Bodily_injury_followed_by_death)
+ggplot(dataReorganized, aes(x = Homicide_robust, y = Bodily_injury_followed_by_death_robust)) + geom_point()
