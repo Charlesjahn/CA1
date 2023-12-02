@@ -330,6 +330,16 @@ ggplot(dataReorganized, aes(x = Homicide_norm, y = Attempted_Homicide_norm)) +
 
 
 
+# Create Dummy Encoding for State
+install.packages('fastDummies')
+library('fastDummies')
+
+dataReorganized <- dummy_cols(dataReorganized, select_columns = 'State')
+
+head(dataReorganized)
+View(dataReorganized)
+
+
 
 
 
