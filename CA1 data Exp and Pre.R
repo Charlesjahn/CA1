@@ -228,3 +228,76 @@ boxplot(Robbery_Institution_robust, main="Robbery_Institution - Robust Scaled", 
 
 # Robust Scaler plot (Homicide x Bodily_injury_followed_by_death)
 ggplot(dataReorganized, aes(x = Homicide_robust, y = Bodily_injury_followed_by_death_robust)) + geom_point()
+
+
+# Reorganize months in order for plotting and analysis
+dataReorganized$Month <- factor(dataReorganized$Month, levels = c("january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"))
+
+# MONTHLY NUMBERS OF A CRIMES OVER THE YEARS (NUMBERS PER MONTH IN DIFFERENT YEARS)
+# Specific crime (To view other types of crimes, just change the variable y)
+ggplot(dataReorganized, aes(x = Month, y = Homicide, fill = as.factor(Year))) +
+  geom_bar(stat = "sum") +
+  labs(title = "Fluctuation of Homicide Numbers",
+       x = "Month",
+       y = "Number of Homicides",
+       fill = "Year") +
+  scale_x_discrete(labels = translation_dict) 
+scale_y_continuous(labels = scales::comma_format()) 
+
+# Total number of crimes
+ggplot(dataReorganized, aes(x = Month, y = Total_Crimes, fill = as.factor(Year))) +
+  geom_bar(stat = "sum") +
+  labs(title = "Fluctuation of Crime Numbers",
+       x = "Month",
+       y = "Number of Crimes",
+       fill = "Year") +
+  scale_x_discrete(labels = translation_dict) +  
+  scale_y_continuous(labels = scales::comma_format())
+
+
+# ANUAL NUMBERS OF A CRIMES OVER THE YEARS (NUMBERS PER YEAR BETWEEN 2025 AND 2022)
+# Specific crime (To view other types of crimes, just change the variable y)
+ggplot(dataReorganized, aes(x = Year, y = Homicide, fill = as.factor(Month))) +
+  geom_bar(stat = "sum") +
+  labs(title = "Fluctuation of Homicide Numbers",
+       x = "Year",
+       y = "Number of Homicides",
+       fill = "Month") +
+  scale_x_discrete(labels = translation_dict)  
+scale_y_continuous(labels = scales::comma_format())  
+
+# Total number of crimes
+ggplot(dataReorganized, aes(x = Year, y = Total_Crimes, fill = as.factor(Month))) +
+  geom_bar(stat = "sum") +
+  labs(title = "Fluctuation of Crime Numbers",
+       x = "Year",
+       y = "Number of Crimes",
+       fill = "Month") +
+  scale_x_discrete(labels = translation_dict) +  
+  scale_y_continuous(labels = scales::comma_format()) 
+
+
+# Heatmap for comparison between months (To view other types of crimes, just change the variable fill)
+heatmap_month <- ggplot(dataReorganized, aes(x = Month, y = State, fill = Homicide)) +
+  geom_tile(width = 0.9, height = 0.9) +
+  labs(title = "Comparison of Homicide Numbers Between States (Month)",
+       x = "Month",
+       y = "State",
+       fill = "Homicide") +
+  scale_x_discrete(labels = translation_dict) +
+  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 250) +  # Specify your custom colors
+  theme_minimal()
+
+print(heatmap_month)
+
+# Heatmap for comparison between years (To view other types of crimes, just change the variable fill)
+heatmap_year <- ggplot(dataReorganized, aes(x = Year, y = State, fill = Rape)) +
+  geom_tile(width = 0.9, height = 0.9) +
+  labs(title = "Comparison of Rape Numbers Between States (Year)",
+       x = "Year",
+       y = "State",
+       fill = "Rape") +
+  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 250) +  # Specify your custom colors
+  theme_minimal()
+
+print(heatmap_year)
