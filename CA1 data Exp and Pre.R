@@ -233,6 +233,7 @@ ggplot(dataReorganized, aes(x = Homicide_robust, y = Bodily_injury_followed_by_d
 # Reorganize months in order for plotting and analysis
 dataReorganized$Month <- factor(dataReorganized$Month, levels = c("january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"))
 
+
 # MONTHLY NUMBERS OF A CRIMES OVER THE YEARS (NUMBERS PER MONTH IN DIFFERENT YEARS)
 # Specific crime (To view other types of crimes, just change the variable y)
 ggplot(dataReorganized, aes(x = Month, y = Homicide, fill = as.factor(Year))) +
@@ -277,15 +278,30 @@ ggplot(dataReorganized, aes(x = Year, y = Total_Crimes, fill = as.factor(Month))
   scale_y_continuous(labels = scales::comma_format()) 
 
 
+
+# Heatmap of total number of crimes between 2015 and 2022
+heatmap_total_crimes <- ggplot(dataReorganized, aes(x = Month, y = as.factor(Year), fill = Total_Crimes)) +
+  geom_tile(stat = "sum") +
+  labs(title = "Crimes Per Month",
+       x = "Month",
+       y = "Year",
+       fill = "Number of Crimes") +
+  scale_x_discrete(labels = translation_dict) +
+  scale_fill_gradient2(low = "blue", mid = "yellow", high = "red", midpoint = 0) + 
+  theme_minimal()
+
+print(heatmap_total_crimes)
+
+
 # Heatmap for comparison between months (To view other types of crimes, just change the variable fill)
 heatmap_month <- ggplot(dataReorganized, aes(x = Month, y = State, fill = Homicide)) +
-  geom_tile(width = 0.9, height = 0.9) +
+  geom_tile(stat = "sum", width = 0.9, height = 0.9) +
   labs(title = "Comparison of Homicide Numbers Between States (Month)",
        x = "Month",
        y = "State",
        fill = "Homicide") +
   scale_x_discrete(labels = translation_dict) +
-  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 250) +  # Specify your custom colors
+  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 250) + 
   theme_minimal()
 
 print(heatmap_month)
@@ -297,7 +313,27 @@ heatmap_year <- ggplot(dataReorganized, aes(x = Year, y = State, fill = Rape)) +
        x = "Year",
        y = "State",
        fill = "Rape") +
-  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 250) +  # Specify your custom colors
+  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 250) +  
   theme_minimal()
 
 print(heatmap_year)
+
+
+
+# Scatter plot to compare the two types of crime
+ggplot(dataReorganized, aes(x = Homicide_norm, y = Attempted_Homicide_norm)) +
+  geom_point() +
+  labs(title = "Correlation between Homicide and Attempted Homicide (Normalized)",
+       x = "Homicide",
+       y = "Attempted Homicide") +
+  theme_minimal() 
+
+
+
+
+
+
+
+
+
+
