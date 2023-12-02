@@ -116,56 +116,94 @@ colnames(statistics) <- c("Mean", "Median", "Minimum", "Maximum", "SD")
 statistics
 
 
-# --- PLOT EXAMPLES WITH ORIGINAL DATA ---
-# Plot (Homicide x Bodily_injury_followed_by_death)
-ggplot(dataReorganized, aes(x = Homicide, y = Bodily_injury_followed_by_death)) + geom_point()
-
-# Plot (between Vehicle_Theft x Vehicle_Robbery)
-ggplot(dataReorganized, aes(x = Vehicle_Theft, y = Vehicle_Robbery)) + geom_point()
-
-# Plot (between Homicide x Attempted_Homicide)
-ggplot(dataReorganized, aes(x = Homicide, y = Attempted_Homicide)) + geom_point()
-
-# Plot (between Robbery_Institution x Cargo_Theft)
-ggplot(dataReorganized, aes(x = Robbery_Institution, y = Cargo_Theft)) + geom_point()
+# --- PLOT OF CORRELATION BETWEEN TWO CRIMES OVER TIME WITH ORIGINAL DATA ---
+# Plot - rates over time (Homicide x Bodily_injury_followed_by_death)
+ggplot(dataReorganized, aes(x = Year, y = Homicide, color = "Homicide")) +
+  geom_point() +
+  geom_point(aes(y = Bodily_injury_followed_by_death, color = "Bodily Injury followed by death")) +
+  labs(title = "Correlation Over Time",
+       x = "Year",
+       y = "Rates",
+       color = "Crime") +
+  scale_color_manual(values = c("Homicide" = "red", "Bodily Injury followed by death" = "blue"))
 
 
-# MinMax Normalization
+# MinMax Normalization function
 normalized_MinMax <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
-# MinMax normalization of Homicide and Bodily_injury_followed_by_death
+# MinMax Normalization of crimes
+Rape_norm<-normalized_MinMax(dataReorganized$Rape)
+Vehicle_Theft_norm<-normalized_MinMax(dataReorganized$Vehicle_Theft)
 Homicide_norm<-normalized_MinMax(dataReorganized$Homicide)
 Bodily_injury_followed_by_death_norm<-normalized_MinMax(dataReorganized$Bodily_injury_followed_by_death)
-# Normalized plot (Homicide x Bodily_injury_followed_by_death)
-ggplot(dataReorganized, aes(x = Homicide_norm, y = Bodily_injury_followed_by_death_norm)) + geom_point()
-
-# MinMax normalization of Vehicle_Theft and Vehicle_Robbery
-Vehicle_Theft_norm<-normalized_MinMax(dataReorganized$Vehicle_Theft)
-Vehicle_Robbery_norm<-normalized_MinMax(dataReorganized$Vehicle_Robbery)
-# Normalized plot (Vehicle_Theft x Vehicle_Robbery)
-ggplot(dataReorganized, aes(x = Vehicle_Theft_norm, y = Vehicle_Robbery_norm)) + geom_point()
-
-# MinMax normalization of Homicide and Attempted_Homicide
-Homicide_norm<-normalized_MinMax(dataReorganized$Homicide)
-Attempted_Homicide_norm<-normalized_MinMax(dataReorganized$Attempted_Homicide)
-# Normalized plot (Homicide x Attempted_Homicide)
-ggplot(dataReorganized, aes(x = Homicide_norm, y = Attempted_Homicide_norm)) + geom_point()
-
-# MinMax normalization of Robbery_Institution and Cargo_Theft
 Robbery_Institution_norm<-normalized_MinMax(dataReorganized$Robbery_Institution)
 Cargo_Theft_norm<-normalized_MinMax(dataReorganized$Cargo_Theft)
-# Normalized plot (Homicide x Attempted_Homicide)
-ggplot(dataReorganized, aes(x = Robbery_Institution_norm, y = Cargo_Theft_norm)) + geom_point()
+Vehicle_Robbery_norm<-normalized_MinMax(dataReorganized$Vehicle_Robbery)
+Robbery_Followed_by_Death_norm<-normalized_MinMax(dataReorganized$Robbery_Followed_by_Death)
+Attempted_Homicide_norm<-normalized_MinMax(dataReorganized$Attempted_Homicide)
+
+# Normalize rates over time (Homicide x Bodily_injury_followed_by_death)
+dataReorganized <- dataReorganized %>%
+  mutate(Year = as.factor(Year)) %>%
+  group_by(Year) %>%
+  mutate(
+    Homicide_norm = normalized_MinMax(Homicide),
+    Bodily_injury_followed_by_death_norm = normalized_MinMax(Bodily_injury_followed_by_death)
+  ) %>%
+  ungroup()
+
+# Normalized plot - rates over time (Homicide x Bodily_injury_followed_by_death)
+ggplot(dataReorganized, aes(x = Year, y = Homicide_norm, color = "Homicide")) +
+  geom_point() +
+  geom_point(aes(y = Bodily_injury_followed_by_death_norm, color = "Bodily Injury followed by death")) +
+  labs(title = "Correlation Over Time",
+       x = "Year",
+       y = "Normalized Rates",
+       color = "Crime") +
+  scale_color_manual(values = c("Homicide" = "red", "Bodily Injury followed by death" = "blue"))
 
 
+# Calculate Z-score
+standardize_zscore <- function(x) {
+  return ((x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE))
+}
 
-# Z-score Standardization  
-Homicide_zscaled<-scale(dataReorganized$Homicide)
-Bodily_injury_followed_by_death_zscaled<-scale(dataReorganized$Bodily_injury_followed_by_death)
-# Z-score plot (Homicide x Bodily_injury_followed_by_death)
-ggplot(dataReorganized, aes(x = Homicide_zscaled, y = Bodily_injury_followed_by_death_zscaled)) + geom_point()
+# Z-scores of crimes
+dataZscaled <- dataReorganized %>%
+  mutate(
+    Rape_zscaled = standardize_zscore(Rape),
+    Vehicle_Theft_zscaled = standardize_zscore(Vehicle_Theft),
+    Homicide_zscaled = standardize_zscore(Homicide),
+    Bodily_injury_followed_by_death_zscaled = standardize_zscore(Bodily_injury_followed_by_death),
+    Robbery_Institution_zscaled = standardize_zscore(Robbery_Institution),
+    Cargo_Theft_zscaled = standardize_zscore(Cargo_Theft),
+    Vehicle_Robbery_zscaled = standardize_zscore(Vehicle_Robbery),
+    Robbery_Followed_by_Death_zscaled = standardize_zscore(Robbery_Followed_by_Death),
+    Attempted_Homicide_zscaled = standardize_zscore(Attempted_Homicide)
+  ) %>%
+  select(State, Year, Month, Rape_zscaled, Vehicle_Theft_zscaled, Homicide_zscaled, Bodily_injury_followed_by_death_zscaled, Robbery_Institution_zscaled, Cargo_Theft_zscaled, Vehicle_Robbery_zscaled,Robbery_Followed_by_Death_zscaled, Attempted_Homicide_zscaled)
+
+View(dataZscaled)
+
+# Melt data 
+dataMelt <- dataZscaled %>%
+  select(State, Year, Month, Rape_zscaled, Vehicle_Theft_zscaled, Homicide_zscaled, Bodily_injury_followed_by_death_zscaled, Robbery_Institution_zscaled, Cargo_Theft_zscaled, Vehicle_Robbery_zscaled,Robbery_Followed_by_Death_zscaled, Attempted_Homicide_zscaled) %>%
+  pivot_longer(cols = c(Vehicle_Theft_zscaled, Vehicle_Robbery_zscaled),
+               names_to = "Crime", values_to = "Z_Score")
+
+View(dataMelt)
+
+# Plot - comparison between states (Vehicle_Theft_zscaled x Vehicle_Robbery_zscaled)
+ggplot(dataMelt, aes(x = State, y = Z_Score, fill = Crime)) +
+  geom_boxplot() +
+  labs(title = "Comparison between states",
+       x = "State",
+       y = "Z-Score",
+       fill = "Crime") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 
@@ -174,7 +212,19 @@ install.packages("robustbase")
 library(robustbase)
 
 # Normalization with Robust Scaler
+Rape_robust <- (dataReorganized$Rape - median(dataReorganized$Rape)) / mad(dataReorganized$Rape)
+Vehicle_Theft_robust <- (dataReorganized$Vehicle_Theft - median(dataReorganized$Vehicle_Theft)) / mad(dataReorganized$Vehicle_Theft)
 Homicide_robust <- (dataReorganized$Homicide - median(dataReorganized$Homicide)) / mad(dataReorganized$Homicide)
 Bodily_injury_followed_by_death_robust <- (dataReorganized$Bodily_injury_followed_by_death - median(dataReorganized$Bodily_injury_followed_by_death)) / mad(dataReorganized$Bodily_injury_followed_by_death)
+
+Robbery_Institution_robust <- (dataReorganized$Robbery_Institution - median(dataReorganized$Robbery_Institution)) / mad(dataReorganized$Robbery_Institution)
+Cargo_Theft_robust <- (dataReorganized$Cargo_Theft - median(dataReorganized$Cargo_Theft)) / mad(dataReorganized$Cargo_Theft)
+Vehicle_Robbery_robust <- (dataReorganized$Vehicle_Robbery - median(dataReorganized$Vehicle_Robbery)) / mad(dataReorganized$Vehicle_Robbery)
+Robbery_Followed_by_Death_robust <- (dataReorganized$Robbery_Followed_by_Death - median(dataReorganized$Robbery_Followed_by_Death)) / mad(dataReorganized$Robbery_Followed_by_Death)
+Attempted_Homicide_robust <- (dataReorganized$Attempted_Homicide - median(dataReorganized$Attempted_Homicide)) / mad(dataReorganized$Attempted_Homicide)
+
+# Boxplot showing outliers
+boxplot(Robbery_Institution_robust, main="Robbery_Institution - Robust Scaled", col="lightgreen", border="black")
+
 # Robust Scaler plot (Homicide x Bodily_injury_followed_by_death)
 ggplot(dataReorganized, aes(x = Homicide_robust, y = Bodily_injury_followed_by_death_robust)) + geom_point()
