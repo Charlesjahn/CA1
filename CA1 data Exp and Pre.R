@@ -2,7 +2,7 @@ getwd()
 setwd("C:/Users/charl/Desktop/classes/Data Exploration and Preparation/CA1")
 library(tidyr)
 library(dplyr)
-
+library(scales)
 library(ggplot2)
 library(gridExtra)
 
@@ -79,14 +79,14 @@ dataReorganized <- dataReorganized %>%
                   Robbery_Institution, Cargo_Theft, Vehicle_Robbery, 
                   Robbery_Followed_by_Death, 
                   Attempted_Homicide), ~as.integer(round(.)))) %>%
-  select(State, Year, Month, Rape, Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, Robbery_Institution, Cargo_Theft, Vehicle_Robbery, Robbery_Followed_by_Death, Attempted_Homicide)
+  select(State, Year, Month, Rape, Vehicle_Theft, Homicide, Bodily_injury_followed_by_death, 
+         Robbery_Institution, Cargo_Theft, Vehicle_Robbery, Robbery_Followed_by_Death, Attempted_Homicide)
 
 # Add a column  "Total Crimes"
 dataReorganized <- dataReorganized %>%
   mutate(Total_Crimes = rowSums(select(., -State, -Year, -Month), na.rm = TRUE))
 
 head(dataReorganized[, c('State', 'Year', 'Month', 'Total_Crimes')], 20)
-
 
 
 # Remove the column 'Year'
@@ -114,6 +114,42 @@ colnames(statistics) <- c("Mean", "Median", "Minimum", "Maximum", "SD")
 
 # show new table with all statistics. 
 statistics
+
+dataReorganized$Date <- as.Date(paste(dataReorganized$Year, dataReorganized$Month, "01"), format = "%Y %B %d")
+
+# Aggregating total crimes by date
+total_crimes_by_date <- dataReorganized %>%
+  group_by(Date) %>%
+  summarise(Total_Crimes = sum(Total_Crimes, na.rm = TRUE))
+
+# Graph
+ggplot(total_crimes_by_date, aes(x = Date, y = Total_Crimes)) +
+  geom_line() +
+  labs(title = "Total Crimes vs Year", x = "Date", y = "Total Crimes")
+
+# Aggregating total crimes by states
+total_crimes_by_state <- aggregate(Total_Crimes ~ State, data = dataReorganized, sum)
+
+# arrange in descending  order
+total_crimes_by_state <- total_crimes_by_state %>%
+  mutate(Mean = Total_Crimes / length(unique(dataReorganized$Year))) %>%
+  arrange(desc(Mean))
+
+# Select tpo 10 states of total crimes
+top_10_states <- head(total_crimes_by_state, 10)
+
+# add % column 
+top_10_states <- top_10_states %>%
+  mutate(Percentage = Mean / sum(Mean) * 100)
+
+# Create a pie plot showing the top 10 mean of crimes
+pie_chart <- ggplot(top_10_states, aes(x = "", y = Percentage, fill = State)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  labs(title = "Top 10 States with high mean") +
+  geom_text(aes(label = paste0(round(Mean))), position = position_stack(vjust = 0.5))
+
+print(pie_chart)
 
 
 # --- PLOT OF CORRELATION BETWEEN TWO CRIMES OVER TIME WITH ORIGINAL DATA ---
@@ -338,12 +374,3 @@ dataReorganized <- dummy_cols(dataReorganized, select_columns = 'State')
 
 head(dataReorganized)
 View(dataReorganized)
-
-
-
-
-
-
-
-
-
