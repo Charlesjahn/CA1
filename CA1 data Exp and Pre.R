@@ -216,7 +216,6 @@ Rape_robust <- (dataReorganized$Rape - median(dataReorganized$Rape)) / mad(dataR
 Vehicle_Theft_robust <- (dataReorganized$Vehicle_Theft - median(dataReorganized$Vehicle_Theft)) / mad(dataReorganized$Vehicle_Theft)
 Homicide_robust <- (dataReorganized$Homicide - median(dataReorganized$Homicide)) / mad(dataReorganized$Homicide)
 Bodily_injury_followed_by_death_robust <- (dataReorganized$Bodily_injury_followed_by_death - median(dataReorganized$Bodily_injury_followed_by_death)) / mad(dataReorganized$Bodily_injury_followed_by_death)
-
 Robbery_Institution_robust <- (dataReorganized$Robbery_Institution - median(dataReorganized$Robbery_Institution)) / mad(dataReorganized$Robbery_Institution)
 Cargo_Theft_robust <- (dataReorganized$Cargo_Theft - median(dataReorganized$Cargo_Theft)) / mad(dataReorganized$Cargo_Theft)
 Vehicle_Robbery_robust <- (dataReorganized$Vehicle_Robbery - median(dataReorganized$Vehicle_Robbery)) / mad(dataReorganized$Vehicle_Robbery)
@@ -236,11 +235,11 @@ dataReorganized$Month <- factor(dataReorganized$Month, levels = c("january", "fe
 
 # MONTHLY NUMBERS OF A CRIMES OVER THE YEARS (NUMBERS PER MONTH IN DIFFERENT YEARS)
 # Specific crime (To view other types of crimes, just change the variable y)
-ggplot(dataReorganized, aes(x = Month, y = Homicide, fill = as.factor(Year))) +
+ggplot(dataReorganized, aes(x = Month, y = Cargo_Theft, fill = as.factor(Year))) +
   geom_bar(stat = "sum") +
-  labs(title = "Fluctuation of Homicide Numbers",
+  labs(title = "Variation of Cargo Thefts Numbers",
        x = "Month",
-       y = "Number of Homicides",
+       y = "Number of Cargo Thefts",
        fill = "Year") +
   scale_x_discrete(labels = translation_dict) 
 scale_y_continuous(labels = scales::comma_format()) 
@@ -248,7 +247,7 @@ scale_y_continuous(labels = scales::comma_format())
 # Total number of crimes
 ggplot(dataReorganized, aes(x = Month, y = Total_Crimes, fill = as.factor(Year))) +
   geom_bar(stat = "sum") +
-  labs(title = "Fluctuation of Crime Numbers",
+  labs(title = "Variation of Crime Numbers",
        x = "Month",
        y = "Number of Crimes",
        fill = "Year") +
@@ -260,7 +259,7 @@ ggplot(dataReorganized, aes(x = Month, y = Total_Crimes, fill = as.factor(Year))
 # Specific crime (To view other types of crimes, just change the variable y)
 ggplot(dataReorganized, aes(x = Year, y = Homicide, fill = as.factor(Month))) +
   geom_bar(stat = "sum") +
-  labs(title = "Fluctuation of Homicide Numbers",
+  labs(title = "Variation of Homicide Numbers",
        x = "Year",
        y = "Number of Homicides",
        fill = "Month") +
@@ -270,7 +269,7 @@ scale_y_continuous(labels = scales::comma_format())
 # Total number of crimes
 ggplot(dataReorganized, aes(x = Year, y = Total_Crimes, fill = as.factor(Month))) +
   geom_bar(stat = "sum") +
-  labs(title = "Fluctuation of Crime Numbers",
+  labs(title = "Variation of Crime Numbers",
        x = "Year",
        y = "Number of Crimes",
        fill = "Month") +
@@ -287,7 +286,7 @@ heatmap_total_crimes <- ggplot(dataReorganized, aes(x = Month, y = as.factor(Yea
        y = "Year",
        fill = "Number of Crimes") +
   scale_x_discrete(labels = translation_dict) +
-  scale_fill_gradient2(low = "blue", mid = "yellow", high = "red", midpoint = 0) + 
+  scale_fill_gradient2(low = "lightblue", mid = "yellow", high = "red", midpoint = 0) + 
   theme_minimal()
 
 print(heatmap_total_crimes)
@@ -313,7 +312,7 @@ heatmap_year <- ggplot(dataReorganized, aes(x = Year, y = State, fill = Rape)) +
        x = "Year",
        y = "State",
        fill = "Rape") +
-  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 250) +  
+  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 600) +  
   theme_minimal()
 
 print(heatmap_year)
@@ -321,11 +320,19 @@ print(heatmap_year)
 
 
 # Scatter plot to compare the two types of crime
-ggplot(dataReorganized, aes(x = Homicide_norm, y = Attempted_Homicide_norm)) +
+ggplot(dataReorganized, aes(x = Vehicle_Theft_norm, y = Vehicle_Robbery_norm)) +
   geom_point() +
-  labs(title = "Correlation between Homicide and Attempted Homicide (Normalized)",
-       x = "Homicide",
-       y = "Attempted Homicide") +
+  labs(title = "Correlation between Vehicle Theft and Vehicle Robbery (Normalized)",
+       x = "Vehicle Theft",
+       y = "Vehicle Robbery") +
+  theme_minimal() 
+
+# Scatter plot to compare the two types of crime
+ggplot(dataReorganized, aes(x = Year, y = Vehicle_Robbery_norm)) +
+  geom_point() +
+  labs(title = "Correlation between Vehicle Theft and Vehicle Robbery (Normalized)",
+       x = "Year",
+       y = "Vehicle Robbery") +
   theme_minimal() 
 
 
@@ -336,7 +343,6 @@ library('fastDummies')
 
 dataReorganized <- dummy_cols(dataReorganized, select_columns = 'State')
 
-head(dataReorganized)
 View(dataReorganized)
 
 
